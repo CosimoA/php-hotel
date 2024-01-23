@@ -10,18 +10,23 @@
 
     <style>
 
+    body {
+        background-color: #f8f9fa;
+    }
+
     .container {
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         padding: 20px;
         background-color: #fff;
         margin-top: 20px;
-        overflow: hidden;
     }
 
     table {
         border-radius: 10px;
         padding-bottom: 20px;
+        overflow: hidden;
+
     }
 
     tr:hover {
@@ -86,6 +91,58 @@ $hotels = [
     echo "</div>"; 
 }  -->
 
+<!-- Form per i filtri -->
+<div class="container mt-3">
+    <form method="get" action="">
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label for="parking">Parcheggio</label>
+                <select id="parking" name="parking" class="form-control">
+                    <option value="">Qualsiasi</option>
+                    <option value="1" <?php if ($parkingFilter === 1) echo 'selected'; ?>>Con parcheggio</option>
+                    <option value="0" <?php if ($parkingFilter === 0) echo 'selected'; ?>>Senza parcheggio</option>
+                </select>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="vote">Voto</label>
+                <select id="vote" name="vote" class="form-control">
+                    <option value="">Qualsiasi</option>
+                    <option value="1" <?php if ($voteFilter === '1') echo 'selected'; ?>>1 stella</option>
+                    <option value="2" <?php if ($voteFilter === '2') echo 'selected'; ?>>2 stelle</option>
+                    <option value="3" <?php if ($voteFilter === '3') echo 'selected'; ?>>3 stelle</option>
+                    <option value="4" <?php if ($voteFilter === '4') echo 'selected'; ?>>4 stelle</option>
+                    <option value="5" <?php if ($voteFilter === '5') echo 'selected'; ?>>5 stelle</option>
+                </select>
+            </div>
+
+            <div class="form-group col-md-2">
+                <button type="submit" class="btn btn-primary mt-4">Filtra</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<?php
+// Filtri
+$parkingFilter = isset($_GET['parking']) ? $_GET['parking'] : null;
+$voteFilter = isset($_GET['vote']) ? $_GET['vote'] : null;
+
+// Filtra gli hotel in base ai criteri specificati
+$filteredHotels = array_filter($hotels, function ($hotel) use ($parkingFilter, $voteFilter) {
+    // Filtra per parcheggio
+    if ($parkingFilter !== "" && $hotel['parking'] != $parkingFilter) {
+        return false; // Non corrisponde al filtro parcheggio
+    }
+
+    // Filtra per voto
+    if ($voteFilter !== "" && $hotel['vote'] != $voteFilter) {
+        return false; // Non corrisponde al filtro voto
+    }
+
+    return true; // Passa tutti i filtri
+});
+
+?>
 
 <div class="container mt-5">
     <table class="table table-striped table-bordered">
@@ -100,7 +157,7 @@ $hotels = [
         </thead>
         <tbody>
             <?php
-            foreach ($hotels as $hotel) {
+            foreach ($filteredHotels as $hotel) {
                 echo "<tr>";
                 echo "<td>{$hotel['name']}</td>";
                 echo "<td>{$hotel['description']}</td>";
@@ -113,6 +170,7 @@ $hotels = [
         </tbody>
     </table>
 </div>
+
 
 </body>
 </html>
